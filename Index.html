@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bicologo — Генератор чистых логотипов</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --bg-gradient: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+            color: white; overflow-x: hidden; padding: 20px;
+        }
+
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            width: 100%; max-width: 500px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); text-align: center;
+        }
+
+        h1 { font-size: 3rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -2px; }
+        .subtitle { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; }
+
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+
+        input, select, textarea {
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05); color: white; font-size: 0.9rem; outline: none;
+        }
+        textarea { height: 60px; resize: none; }
+        option { background: #333; color: white; }
+
+        .btn-generate {
+            width: 100%; padding: 16px; border-radius: 12px; border: none; background: white;
+            color: var(--primary); font-weight: 700; cursor: pointer; transition: 0.4s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-nav {
+            background: transparent; border: 1px solid var(--glass-border); color: white;
+            margin-top: 10px; font-size: 0.8rem; opacity: 0.9;
+        }
+
+        .like-dislike { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; }
+        .reaction-btn { background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; gap: 5px; opacity: 0.7; transition: 0.3s; }
+        .reaction-btn:hover { opacity: 1; transform: scale(1.1); }
+        .reaction-btn.active { opacity: 1; color: #ffeb3b; }
+
+        .logo-preview {
+            width: 280px; height: 280px; background: white; border-radius: 20px;
+            margin: 0 auto; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; border: 5px solid var(--primary); color: #333;
+            position: relative;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #intro-section, #home-ui, #result-section, #security-section, #info-section, #questions-section { display: none; text-align: left; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .info-block { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.4; }
+        .info-block strong { display: block; margin-bottom: 5px; color: #fff; display: flex; align-items: center; gap: 5px; }
+
+        .chat-box { height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px; margin-bottom: 10px; font-size: 0.8rem; }
+        .chat-msg { margin-bottom: 8px; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.1); }
+
+        .policy-link { color: #60a5fa; text-decoration: underline; cursor: pointer; font-weight: 600; }
+        .checkbox-container { display: flex; align-items: center; gap: 10px; margin: 20px 0; font-size: 0.85rem; cursor: pointer; text-align: left; }
+        .checkbox-container input { width: 20px; height: 20px; cursor: pointer; }
+
+        #ad-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        
+        <div id="intro-section" style="display: block;">
+            <h1>Добро пожаловать</h1>
+            <p class="subtitle" style="text-align: center;">Перед началом работы с ИИ, пожалуйста, подтвердите согласие.</p>
+            
+            <div class="info-block">
+                <p>Мы используем передовые технологии для создания ваших логотипов. Нажимая кнопку, вы подтверждаете, что ознакомлены с правилами сервиса.</p>
+            </div>
+
+            <label class="checkbox-container">
+                <input type="checkbox" id="policyAgree" onchange="toggleIntroBtn()">
+                <span>Я принимаю <span class="policy-link" onclick="window.open('https://policies.google.com/privacy', '_blank')">Политику конфиденциальности</span></span>
+            </label>
+
+            <button id="btn-start" class="btn-generate" disabled onclick="showSection('home-ui')">
+                Принять и продолжить
+            </button>
+        </div>
+
+        <div id="home-ui">
+            <h1 style="text-align: center;">Bicologo</h1>
+            <p class="subtitle" style="text-align: center;">ИИ-генератор чистых логотипов</p>
+
+            <div class="like-dislike">
+                <button class="reaction-btn" id="btn-like" onclick="handleVote('like')">
+                    <i data-lucide="thumbs-up"></i> <span id="likeCount">0</span>
+                </button>
+                <button class="reaction-btn" id="btn-dislike" onclick="handleVote('dislike')">
+                    <i data-lucide="thumbs-down"></i> <span id="dislikeCount">0</span>
+                </button>
+            </div>
+
+            <div class="input-group">
+                <label>Название бренда</label>
+                <input type="text" id="brandName" placeholder="Напр: Bicon">
+            </div>
+
+            <div class="input-group">
+                <label>Главная буква</label>
+                <input type="text" id="brandSymbol" placeholder="Напр: B" maxlength="2">
+            </div>
+
+            <div class="input-group">
+                <label>Описание (форма, цель)</label>
+                <textarea id="brandDesc" placeholder="Напр: круговая форма а внутри логотип"></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div class="input-group">
+                    <label>Цвет</label>
+                    <select id="logoColor">
+                        <option value="blue">Синий</option>
+                        <option value="red">Красный</option>
+                        <option value="gold">Золотой</option>
+                        <option value="black">Черный</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Шрифт</label>
+                    <select id="logoFont">
+                        <option value="modern sans-serif">Модерн</option>
+                        <option value="classic serif">Классика</option>
+                        <option value="futuristic">Техно</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-generate" onclick="startGeneration()">
+                <i data-lucide="sparkles"></i> Сгенерировать бесплатно
+            </button>
+
+            <button class="btn-generate btn-nav" onclick="showSection('security-section')">
+                <i data-lucide="shield-check" style="width:14px;"></i> Безопасность
+            </button>
+
+            <button class="btn-generate btn-nav" onclick="showSection('info-section')">
+                <i data-lucide="info" style="width:14px;"></i> Информация
+            </button>
+
+            <button class="btn-generate btn-nav" onclick="showSection('questions-section')">
+                <i data-lucide="message-circle" style="width:14px;"></i> Вопросы
+            </button>
+
+            <div id="result-section" style="text-align: center; margin-top: 20px;">
+                <div class="logo-preview" id="logoResult"></div>
+                <button class="btn-generate" style="background: #22c55e; color: white; margin-top: 15px;" onclick="downloadLogo()">Скачать PNG</button>
+                <button class="btn-generate btn-nav" onclick="location.reload()">Создать еще</button>
+            </div>
+        </div>
+
+        <div id="info-section">
+            <h2 style="margin-bottom: 20px;">Информация</h2>
+            <div class="info-block">
+                <strong>Основатель/Владелец:</strong>
+                <p>Проект Bicologo создан и поддерживается разработчиком BiconPlay (mermeriy@email.com). Наша главная цель — сделать профессиональный графический дизайн доступным для каждого пользователя интернета. Мы постоянно работаем над улучшением алгоритмов генерации, чтобы вы получали максимально качественные и стильные логотипы для своих идей. Если у вас возникли вопросы по работе сервиса, предложения по сотрудничеству или технические трудности, вы всегда можете связаться с нами по электронной почте.</p>
+            </div>
+            <div class="info-block">
+                <strong>О сервисе</strong>
+                <p>Наш искусственный интеллект Bicologo генерирует уникальные логотипы в режиме реального времени. Обычно создание занимает от 15 до 30 секунд, однако в моменты высокой нагрузки на сервера нейросети процесс может длиться дольше. Если у вас не прогружается картинка сразу, пожалуйста, подождите около 1-5 минут или попробуйте обновить страницу и изменить описание. Мы рекомендуем использовать стабильное Wi-Fi соединение для быстрой загрузки графических элементов в высоком разрешении. Помните, что каждый запрос обрабатывается индивидуально для достижения наилучшего качества дизайна.</p>
+            </div>
+            <button class="btn-generate" onclick="showSection('home-ui')">Вернуться назад</button>
+        </div>
+
+        <div id="security-section">
+            <h2 style="margin-bottom: 20px;">Безопасность</h2>
+            <div class="info-block">
+                <strong><i data-lucide="shield"></i> Чистый контент</strong>
+                <p>Интеллектуальная система Bicologo функционирует на базе многоуровневых фильтров безопасности от Google и технологических решений Pollinations, что гарантирует надежную защиту от генерации нежелательного или неприемлемого контента. Мы применяем передовые методы модерации запросов в реальном времени, обеспечивая создание только чистого, этичного и качественного графического материала. Наш сервис строго придерживается современных стандартов цифровой безопасности, предотвращая любые попытки использования нейросети в деструктивных целях. Мы постоянно обновляем наши протоколы фильтрации, чтобы каждый пользователь мог наслаждаться творческим процессом в абсолютно защищенной и дружелюбной цифровой среде, не беспокоясь о сохранности своих данных или корректности выдаваемых результатов.</p>
+            </div>
+            <button class="btn-generate" onclick="showSection('home-ui')">Вернуться назад</button>
+        </div>
+
+        <div id="questions-section">
+            <h2 style="margin-bottom: 10px;">Вопросы и отзывы</h2>
+            <div style="margin-bottom: 10px; font-size: 0.75rem; color: #aaa;">
+                <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
+                    <input type="checkbox" id="adminToggle" onchange="toggleAdminMode()"> Я создатель (Админ)
+                </label>
+            </div>
+            <div class="chat-box" id="chatBox"></div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="chatInput" placeholder="Задать вопрос..." style="flex:1;">
+                <button id="chatBtn" onclick="sendMsg()" class="btn-generate" style="width: auto; padding: 0 15px; font-size: 0.8rem;">Спросить</button>
+            </div>
+            <button class="btn-generate btn-nav" onclick="showSection('home-ui')" style="margin-top: 15px;">Вернуться назад</button>
+        </div>
+    </div>
+
+    <div id="ad-overlay">
+        <p>ИИ анализирует описание и подбирает стиль...</p>
+        <div class="countdown" id="timer" style="font-size: 3rem; font-weight:800; color:var(--primary);">15</div>
+        <div style="width:280px; height:150px; border:1px dashed #444; margin:20px; display:flex; align-items:center; justify-content:center; color:#666;">[ РЕКЛАМА ]</div>
+        <button id="close-ad" class="btn-generate" style="display:none; max-width: 200px;" onclick="finishGeneration()">Показать логотип</button>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let aiImageUrl = "";
+
+        function toggleIntroBtn() {
+            const agreed = document.getElementById('policyAgree').checked;
+            document.getElementById('btn-start').disabled = !agreed;
+        }
+
+        function showSection(id) {
+            ['intro-section', 'home-ui', 'security-section', 'info-section', 'questions-section'].forEach(s => {
+                const el = document.getElementById(s);
+                if(el) el.style.display = (s === id) ? 'block' : 'none';
+            });
+        }
+
+        let currentVote = null;
+        let likesCount = 0;
+        let dislikesCount = 0;
+
+        function handleVote(type) {
+            if (currentVote === type) {
+                if (type === 'like') likesCount--;
+                if (type === 'dislike') dislikesCount--;
+                currentVote = null;
+            } else {
+                if (currentVote === 'like') likesCount--;
+                if (currentVote === 'dislike') dislikesCount--;
+                if (type === 'like') likesCount++;
+                if (type === 'dislike') dislikesCount++;
+                currentVote = type;
+            }
+            document.getElementById('likeCount').innerText = likesCount;
+            document.getElementById('dislikeCount').innerText = dislikesCount;
+            document.getElementById('btn-like').classList.toggle('active', currentVote === 'like');
+            document.getElementById('btn-dislike').classList.toggle('active', currentVote === 'dislike');
+        }
+
+        let isAdmin = false;
+        function toggleAdminMode() {
+            const checkbox = document.getElementById('adminToggle');
+            if (checkbox.checked) {
+                const pass = prompt("Введите секретный код админа:");
+                if (pass === "787857") {
+                    isAdmin = true;
+                    alert("Режим админа активирован!");
+                } else {
+                    alert("Неверный код доступа!");
+                    checkbox.checked = false;
+                    isAdmin = false;
+                }
+            } else { isAdmin = false; }
+        }
+
+        function sendMsg() {
+            const val = document.getElementById('chatInput').value;
+            if(!val) return;
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg';
+            msg.innerHTML = isAdmin ? `<strong style="color:var(--primary);">Админ:</strong> ${val}` : `<strong>Пользователь:</strong> ${val}`;
+            document.getElementById('chatBox').appendChild(msg);
+            document.getElementById('chatInput').value = '';
+            document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+        }
+
+        function startGeneration() {
+            const name = document.getElementById('brandName').value;
+            const symbol = document.getElementById('brandSymbol').value;
+            const desc = document.getElementById('brandDesc').value;
+            const color = document.getElementById('logoColor').value;
+            const font = document.getElementById('logoFont').value;
+            if(!name || !symbol) return alert("Заполните название и букву!");
+
+            const fullPrompt = `Minimalist vector logo, white background, symbol "${symbol}", name "${name}", flat design, color ${color}, font ${font}, ${desc}`;
+            aiImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?width=1024&height=1024&seed=${Math.floor(Math.random()*9999)}&nologo=true`;
+
+            // Убрали фоновую предзагрузку, которая вызывала баг
+
+            document.getElementById('ad-overlay').style.display = 'flex';
+            let timeLeft = 15;
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = timeLeft;
+                if(timeLeft <= 0) { clearInterval(timer); document.getElementById('close-ad').style.display = 'flex'; }
+            }, 1000);
+        }
+
+        function finishGeneration() {
+            document.getElementById('ad-overlay').style.display = 'none';
+            document.getElementById('result-section').style.display = 'block';
+            const res = document.getElementById('logoResult');
+            
+            // Надежный метод вставки для любых мобильных редакторов
+            res.innerHTML = `<img src="${aiImageUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="Идет генерация логотипа...">`;
+        }
+
+        async function downloadLogo() {
+            if(!aiImageUrl) return;
+            try {
+                const response = await fetch(aiImageUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const name = document.getElementById('brandName').value || 'logo';
+                a.download = `Bicologo_${name}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (e) {
+                alert("Пожалуйста, зажмите картинку пальцем и выберите 'Сохранить изображение'.");
+            }
+        }
+    </script>
+</body>
+</html>
