@@ -30,6 +30,7 @@
             background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
             width: 100%; max-width: 500px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); text-align: center;
+            margin-bottom: 20px;
         }
 
         h1 { font-size: 3rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -2px; }
@@ -40,16 +41,19 @@
 
         input, select, textarea {
             width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.05); color: white; font-size: 0.9rem; outline: none;
+            background: rgba(255, 255, 255, 0.05); color: white; font-size: 0.9rem; outline: none; transition: 0.3s;
         }
-        textarea { height: 60px; resize: none; }
+        input:focus, textarea:focus { background: rgba(255, 255, 255, 0.1); border-color: white; }
+        textarea { height: 80px; resize: none; }
         option { background: #333; color: white; }
 
         .btn-generate {
             width: 100%; padding: 16px; border-radius: 12px; border: none; background: white;
             color: var(--primary); font-weight: 700; cursor: pointer; transition: 0.4s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;
         }
+        .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-generate:active { transform: scale(0.98); }
         .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-nav {
@@ -64,34 +68,36 @@
 
         .logo-preview {
             width: 280px; height: 280px; background: white; border-radius: 20px;
-            margin: 0 auto; display: flex; align-items: center; justify-content: center;
+            margin: 20px auto; display: flex; align-items: center; justify-content: center;
             overflow: hidden; border: 5px solid var(--primary); color: #333;
-            position: relative;
+            position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-
-        .loader {
-            border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .logo-preview img { width: 100%; height: 100%; object-fit: contain; }
 
         #intro-section, #home-ui, #result-section, #security-section, #info-section, #questions-section { display: none; text-align: left; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .info-block { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.4; }
-        .info-block strong { display: block; margin-bottom: 5px; color: #fff; display: flex; align-items: center; gap: 5px; }
+        .info-block { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.5; }
+        .info-block strong { color: #fff; font-size: 1rem; margin-bottom: 8px; display: block; }
 
-        .chat-box { height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 10px; margin-bottom: 10px; font-size: 0.8rem; }
-        .chat-msg { margin-bottom: 8px; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.1); }
+        .chat-box { height: 250px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; margin-bottom: 10px; font-size: 0.8rem; border: 1px solid var(--glass-border); }
+        .chat-msg { margin-bottom: 10px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.1); }
+        .chat-msg b { color: var(--primary); }
 
-        .policy-link { color: #60a5fa; text-decoration: underline; cursor: pointer; font-weight: 600; }
-        .checkbox-container { display: flex; align-items: center; gap: 10px; margin: 20px 0; font-size: 0.85rem; cursor: pointer; text-align: left; }
-        .checkbox-container input { width: 20px; height: 20px; cursor: pointer; }
+        .checkbox-container { display: flex; align-items: center; gap: 10px; margin: 20px 0; font-size: 0.85rem; cursor: pointer; }
+        .checkbox-container input { width: 22px; height: 22px; }
 
         #ad-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95);
-            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.98);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
         }
+
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1); border-top-color: white;
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body>
@@ -99,137 +105,137 @@
     <div class="glass-card">
         
         <div id="intro-section" style="display: block;">
-            <h1>Добро пожаловать</h1>
-            <p class="subtitle" style="text-align: center;">Перед началом работы с ИИ, пожалуйста, подтвердите согласие.</p>
-            
+            <h1>Bicologo</h1>
+            <p class="subtitle" style="text-align:center;">Добро пожаловать в будущее графического дизайна</p>
             <div class="info-block">
-                <p>Мы используем передовые технологии для создания ваших логотипов. Нажимая кнопку, вы подтверждаете, что ознакомлены с правилами сервиса.</p>
+                <strong>Важное уведомление:</strong>
+                <p>Наш сервис использует нейросеть Flux Schnell. Создание логотипа занимает около 8-10 секунд. Все генерации бесплатны.</p>
             </div>
-
             <label class="checkbox-container">
                 <input type="checkbox" id="policyAgree" onchange="toggleIntroBtn()">
-                <span>Я принимаю <span class="policy-link" onclick="window.open('https://policies.google.com/privacy', '_blank')">Политику конфиденциальности</span></span>
+                <span>Я согласен с правилами и политикой конфиденциальности</span>
             </label>
-
-            <button id="btn-start" class="btn-generate" disabled onclick="showSection('home-ui')">
-                Принять и продолжить
-            </button>
+            <button id="btn-start" class="btn-generate" disabled onclick="showSection('home-ui')">Начать работу</button>
         </div>
 
         <div id="home-ui">
-            <h1 style="text-align: center;">Bicologo</h1>
-            <p class="subtitle" style="text-align: center;">ИИ-генератор чистых логотипов</p>
-
+            <h2 style="text-align: center; margin-bottom: 10px;">Создать логотип</h2>
+            
             <div class="like-dislike">
-                <button class="reaction-btn" id="btn-like" onclick="handleVote('like')">
-                    <i data-lucide="thumbs-up"></i> <span id="likeCount">0</span>
-                </button>
-                <button class="reaction-btn" id="btn-dislike" onclick="handleVote('dislike')">
-                    <i data-lucide="thumbs-down"></i> <span id="dislikeCount">0</span>
-                </button>
+                <button class="reaction-btn" id="btn-like" onclick="handleVote('like')"><i data-lucide="thumbs-up"></i> <span id="likeCount">0</span></button>
+                <button class="reaction-btn" id="btn-dislike" onclick="handleVote('dislike')"><i data-lucide="thumbs-down"></i> <span id="dislikeCount">0</span></button>
             </div>
 
             <div class="input-group">
-                <label>Название бренда</label>
-                <input type="text" id="brandName" placeholder="Напр: Bicon">
+                <label>Название вашего бренда</label>
+                <input type="text" id="brandName" placeholder="Напр: Bicon Play">
             </div>
 
             <div class="input-group">
-                <label>Главная буква</label>
+                <label>Символ или Буква</label>
                 <input type="text" id="brandSymbol" placeholder="Напр: B" maxlength="2">
             </div>
 
             <div class="input-group">
-                <label>Описание (форма, цель)</label>
-                <textarea id="brandDesc" placeholder="Напр: круговая форма а внутри логотип"></textarea>
+                <label>Детали стиля (через запятую)</label>
+                <textarea id="brandDesc" placeholder="Напр: круглая форма, минимализм, хай-тек, острые углы"></textarea>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                 <div class="input-group">
                     <label>Цвет</label>
                     <select id="logoColor">
-                        <option value="blue">Синий</option>
-                        <option value="red">Красный</option>
-                        <option value="gold">Золотой</option>
-                        <option value="black">Черный</option>
+                        <option value="electric blue">Синий</option>
+                        <option value="crimson red">Красный</option>
+                        <option value="luxury gold">Золотой</option>
+                        <option value="pure black">Черный</option>
+                        <option value="emerald green">Зеленый</option>
                     </select>
                 </div>
                 <div class="input-group">
                     <label>Шрифт</label>
                     <select id="logoFont">
-                        <option value="modern sans-serif">Модерн</option>
-                        <option value="classic serif">Классика</option>
-                        <option value="futuristic">Техно</option>
+                        <option value="modern minimalist sans-serif">Модерн</option>
+                        <option value="classic elegant serif">Классика</option>
+                        <option value="bold futuristic tech">Футуризм</option>
+                        <option value="handwritten luxury script">Рукописный</option>
                     </select>
                 </div>
             </div>
 
             <button class="btn-generate" onclick="startGeneration()">
-                <i data-lucide="sparkles"></i> Сгенерировать бесплатно
+                <i data-lucide="zap"></i> Сгенерировать логотип
             </button>
 
-            <button class="btn-generate btn-nav" onclick="showSection('security-section')">
-                <i data-lucide="shield-check" style="width:14px;"></i> Безопасность
-            </button>
+            <button class="btn-generate btn-nav" onclick="showSection('security-section')"><i data-lucide="shield"></i> Безопасность</button>
+            <button class="btn-generate btn-nav" onclick="showSection('info-section')"><i data-lucide="info"></i> О проекте</button>
+            <button class="btn-generate btn-nav" onclick="showSection('questions-section')"><i data-lucide="help-circle"></i> Вопросы и Ответы</button>
 
-            <button class="btn-generate btn-nav" onclick="showSection('info-section')">
-                <i data-lucide="info" style="width:14px;"></i> Информация
-            </button>
-
-            <button class="btn-generate btn-nav" onclick="showSection('questions-section')">
-                <i data-lucide="message-circle" style="width:14px;"></i> Вопросы
-            </button>
-
-            <div id="result-section" style="text-align: center; margin-top: 20px;">
-                <div class="logo-preview" id="logoResult"></div>
-                <button class="btn-generate" style="background: #22c55e; color: white; margin-top: 15px;" onclick="downloadLogo()">Скачать PNG</button>
-                <button class="btn-generate btn-nav" onclick="location.reload()">Создать еще</button>
+            <div id="result-section">
+                <div class="logo-preview" id="logoResult">
+                    <p style="color:#888; font-size:0.8rem;">Здесь появится ваш логотип</p>
+                </div>
+                <button class="btn-generate" style="background: #22c55e; color: white;" onclick="downloadLogo()">
+                    <i data-lucide="download"></i> Скачать в PNG
+                </button>
+                <button class="btn-generate btn-nav" onclick="location.reload()">Сбросить всё</button>
             </div>
         </div>
 
         <div id="info-section">
-            <h2 style="margin-bottom: 20px;">Информация</h2>
+            <h1>О проекте</h1>
             <div class="info-block">
-                <strong>Основатель/Владелец:</strong>
-                <p>Проект Bicologo создан и поддерживается разработчиком BiconPlay (mermeriy@email.com). Наша главная цель — сделать профессиональный графический дизайн доступным для каждого пользователя интернета. Мы постоянно работаем над улучшением алгоритмов генерации, чтобы вы получали максимально качественные и стильные логотипы для своих идей. Если у вас возникли вопросы по работе сервиса, предложения по сотрудничеству или технические трудности, вы всегда можете связаться с нами по электронной почте.</p>
+                <strong>Автор:</strong>
+                <p>BiconPlay (mermeriy@email.com)</p>
+                <br>
+                <strong>Миссия:</strong>
+                <p>Мы верим, что качественный дизайн должен быть доступен каждому. Bicologo использует мощности искусственного интеллекта для мгновенного создания брендинга.</p>
             </div>
-            <div class="info-block">
-                <strong>О сервисе</strong>
-                <p>Наш искусственный интеллект Bicologo генерирует уникальные логотипы в режиме реального времени. Обычно создание занимает от 15 до 30 секунд, однако в моменты высокой нагрузки на сервера нейросети процесс может длиться дольше. Если у вас не прогружается картинка сразу, пожалуйста, подождите около 1-5 минут или попробуйте обновить страницу и изменить описание. Мы рекомендуем использовать стабильное Wi-Fi соединение для быстрой загрузки графических элементов в высоком разрешении. Помните, что каждый запрос обрабатывается индивидуально для достижения наилучшего качества дизайна.</p>
-            </div>
-            <button class="btn-generate" onclick="showSection('home-ui')">Вернуться назад</button>
+            <button class="btn-generate" onclick="showSection('home-ui')">Назад в меню</button>
         </div>
 
         <div id="security-section">
-            <h2 style="margin-bottom: 20px;">Безопасность</h2>
+            <h1>Безопасность</h1>
             <div class="info-block">
-                <strong><i data-lucide="shield"></i> Чистый контент</strong>
-                <p>Интеллектуальная система Bicologo функционирует на базе многоуровневых фильтров безопасности от Google и технологических решений Pollinations, что гарантирует надежную защиту от генерации нежелательного или неприемлемого контента. Мы применяем передовые методы модерации запросов в реальном времени, обеспечивая создание только чистого, этичного и качественного графического материала. Наш сервис строго придерживается современных стандартов цифровой безопасности, предотвращая любые попытки использования нейросети в деструктивных целях. Мы постоянно обновляем наши протоколы фильтрации, чтобы каждый пользователь мог наслаждаться творческим процессом в абсолютно защищенной и дружелюбной цифровой среде, не беспокоясь о сохранности своих данных или корректности выдаваемых результатов.</p>
+                <strong>Защита данных:</strong>
+                <p>Мы не сохраняем ваши названия брендов на сервере. Все генерации происходят анонимно через зашифрованные шлюзы Pollinations API.</p>
+                <br>
+                <strong>Фильтрация:</strong>
+                <p>ИИ автоматически блокирует создание непристойного или агрессивного контента.</p>
             </div>
-            <button class="btn-generate" onclick="showSection('home-ui')">Вернуться назад</button>
+            <button class="btn-generate" onclick="showSection('home-ui')">Назад в меню</button>
         </div>
 
         <div id="questions-section">
-            <h2 style="margin-bottom: 10px;">Вопросы и отзывы</h2>
-            <div style="margin-bottom: 10px; font-size: 0.75rem; color: #aaa;">
-                <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
-                    <input type="checkbox" id="adminToggle" onchange="toggleAdminMode()"> Я создатель (Админ)
-                </label>
+            <h1>Вопросы</h1>
+            <div style="margin-bottom: 10px;">
+                <label style="cursor:pointer; font-size: 0.7rem;"><input type="checkbox" id="adminToggle" onchange="toggleAdminMode()"> Режим Администратора</label>
             </div>
-            <div class="chat-box" id="chatBox"></div>
-            <div style="display: flex; gap: 5px;">
-                <input type="text" id="chatInput" placeholder="Задать вопрос..." style="flex:1;">
-                <button id="chatBtn" onclick="sendMsg()" class="btn-generate" style="width: auto; padding: 0 15px; font-size: 0.8rem;">Спросить</button>
+            <div class="chat-box" id="chatBox">
+                <div class="chat-msg"><b>Система:</b> Добро пожаловать! Задайте любой вопрос по работе ИИ.</div>
             </div>
-            <button class="btn-generate btn-nav" onclick="showSection('home-ui')" style="margin-top: 15px;">Вернуться назад</button>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="chatInput" placeholder="Ваш вопрос..." style="flex:1;">
+                <button onclick="sendMsg()" class="btn-generate" style="width: auto; padding: 0 15px; margin:0;">Отправить</button>
+            </div>
+            <button class="btn-generate btn-nav" onclick="showSection('home-ui')" style="margin-top:20px;">Назад в меню</button>
         </div>
+
     </div>
 
     <div id="ad-overlay">
-        <p>ИИ анализирует описание и подбирает стиль...</p>
-        <div class="countdown" id="timer" style="font-size: 3rem; font-weight:800; color:var(--primary);">15</div>
-        <div style="width:280px; height:150px; border:1px dashed #444; margin:20px; display:flex; align-items:center; justify-content:center; color:#666;">[ РЕКЛАМА ]</div>
-        <button id="close-ad" class="btn-generate" style="display:none; max-width: 200px;" onclick="finishGeneration()">Показать логотип</button>
+        <div class="spinner"></div>
+        <h2 style="margin-bottom: 10px;">ИИ работает...</h2>
+        <p style="opacity: 0.7; margin-bottom: 20px;">Подбираем формы и шрифты</p>
+        <div id="timer" style="font-size: 4rem; font-weight:800; color:var(--primary); margin-bottom: 20px;">10</div>
+        
+        <div style="width:300px; height:150px; background:rgba(255,255,255,0.05); border:1px solid #444; display:flex; align-items:center; justify-content:center; text-align:center; padding:10px;">
+            <small>РЕКЛАМА<br>Ваш логотип будет готов через мгновение</small>
+        </div>
+
+        <button id="close-ad" class="btn-generate" style="display:none; max-width: 250px; margin-top: 30px;" onclick="finishGeneration()">
+            ПОКАЗАТЬ РЕЗУЛЬТАТ
+        </button>
     </div>
 
     <script>
@@ -348,4 +354,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+                
